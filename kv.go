@@ -18,8 +18,8 @@ func get_kvs(lines iter.Seq[string]) []keyValue {
 		parts := strings.Split(line, "=")
 		if len(parts) < 2 { continue }
 		kvs = append(kvs, keyValue{
-			key: parts[0],
-			value: strings.Join(parts[1:], " "),
+			key: strings.Trim(parts[0], `\n`),
+			value: strings.Trim(strings.Join(parts[1:], " "), `\n`),
 		})
 	}
 	return kvs
@@ -40,7 +40,7 @@ func sub_kvs(inbytes []byte, kvs []keyValue) ([]byte) {
 	return b
 }
 
-func Kv_Run(opt Option, inbytes []byte) ([]byte, error) {
+func Kv_Run(opt Option, c *Command, inbytes []byte) ([]byte, error) {
 	if len(opt.args) == 0 {
 		return nil, fmt.Errorf("kvinput has no value")
 	}
