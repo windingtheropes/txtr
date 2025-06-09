@@ -19,7 +19,7 @@ func get_kvs(lines iter.Seq[string]) []keyValue {
 		if len(parts) < 2 { continue }
 		kvs = append(kvs, keyValue{
 			key: strings.Trim(parts[0], `\n`),
-			value: strings.Trim(strings.Join(parts[1:], " "), `\n`),
+			value: strings.TrimSpace(strings.Join(parts[1:], " ")),
 		})
 	}
 	return kvs

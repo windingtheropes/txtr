@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strings"
 )
-const VERSION string = "v0.11"
+const VERSION string = "v0.13"
 const DATESTRING string = "june 2025"
 const HELP_MSG string = 
 `Usage:
@@ -169,6 +169,5 @@ func main() {
 		Help()
 		return
 	}
-	fmt.Printf("%v\n", string(cmd.bytes))
 	os.WriteFile(cmd.args.output, cmd.bytes, os.ModePerm)
 }
