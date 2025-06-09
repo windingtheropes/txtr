@@ -36,11 +36,11 @@ type Option struct {
 }
 type OptHandler struct {
 	aliases []string
-	handle  func(Option, *Command, []byte) ([]byte, error)
+	handle  func(Option, *Command) (error)
 }
 
 // Dirty copy of the fmt.printf function, wrapped to only print on verbose
-func (c Command) Vlog(format string, a ...any) (n int, err error) {
+func (c *Command) Vlog(format string, a ...any) (n int, err error) {
 	if !c.Flag("v") {
 		return 0, nil
 	}
@@ -55,10 +55,10 @@ type Command struct {
 	optionHandlers []OptHandler
 }
 
-func (c Command) Flag(key string) bool {
+func (c *Command) Flag(key string) bool {
 	return slices.Contains(c.flags, key)
 }
-func (c Command) GetOption(alias string) []Option {
+func (c *Command) GetOption(alias string) []Option {
 	var opts []Option
 	for i := range c.options {
 		opt := c.options[i]
@@ -68,24 +68,23 @@ func (c Command) GetOption(alias string) []Option {
 	}
 	return nil
 }
-func (c Command) RunOpts() error {
+func (c *Command) RunOpts() error {
 	for i := range c.options {
 		opt := c.options[i]
 
 		for hi := range c.optionHandlers {
 			h := c.optionHandlers[hi]
 			if slices.Contains(h.aliases, opt.name) {
-				b, err := h.handle(opt, &c, c.bytes)
+				err := h.handle(opt, c)
 				if err != nil {
 					return err
 				}
-				c.bytes = b
 			}
 		}
 	}
 	return nil
 }
-func (c Command) ScanFlags(args []string) []string {
+func (c *Command) ScanFlags(args []string) []string {
 	var flags []string
 	for i := range args {
 		arg := args[i]
@@ -98,7 +97,7 @@ func (c Command) ScanFlags(args []string) []string {
 	}
 	return flags
 }
-func (c Command) ScanOpts(args []string, starti int, options []Option) []Option {
+func (c *Command) ScanOpts(args []string, starti int, options []Option) []Option {
 	var optname []string
 	var optargs []string
 	for i := starti; i < len(args); i++ {
@@ -170,5 +169,6 @@ func main() {
 		Help()
 		return
 	}
+	fmt.Printf("%v\n", string(cmd.bytes))
 	os.WriteFile(cmd.args.output, cmd.bytes, os.ModePerm)
 }

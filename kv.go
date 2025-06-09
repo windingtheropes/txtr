@@ -40,15 +40,16 @@ func sub_kvs(inbytes []byte, kvs []keyValue) ([]byte) {
 	return b
 }
 
-func Kv_Run(opt Option, c *Command, inbytes []byte) ([]byte, error) {
+func Kv_Run(opt Option, c *Command) (error) {
 	if len(opt.args) == 0 {
-		return nil, fmt.Errorf("kvinput has no value")
+		return fmt.Errorf("kvinput has no value")
 	}
 	
 	kv_bytes, err := os.ReadFile(opt.args[0])
 	if err != nil {
-		return nil, err
+		return err
 	}
 	
-	return sub_kvs(inbytes, get_kvs(strings.Lines(string(kv_bytes)))), nil
+	c.bytes = sub_kvs(c.bytes, get_kvs(strings.Lines(string(kv_bytes))))
+	return nil
 }
